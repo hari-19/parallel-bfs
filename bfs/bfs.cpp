@@ -1,11 +1,10 @@
 #include "bfs.h"
-#include <iostream>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <cstddef>
 #include <omp.h>
-#include <unordered_map>
 
 #include "../common/CycleTimer.h"
 #include "../common/graph.h"
@@ -108,8 +107,8 @@ void bottom_up_step(
     vertex_set* new_frontier,
     int* distances)
 {
-    std::unordered_map<int, bool> fmap;
-    
+    bool fmap[g->num_nodes] = { false };
+
     for(int i=0; i<frontier->count; i++) {
         fmap[frontier->vertices[i]] = true;
     }
