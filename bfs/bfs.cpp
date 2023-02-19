@@ -169,12 +169,7 @@ void bottom_up_step(
                     Vertex u = g->incoming_edges[j];
                     if(fmap[u]) {
                         distances[v] = distances[u] + 1;
-                        
-                        int index;
-                    
-                        // #pragma omp critical
-                        index = new_frontier->count++;
-                    
+                                          
                         new_frontier_private->vertices[new_frontier_private->count++] = v;
                         // nf_private.push_back(v);
                         break;
