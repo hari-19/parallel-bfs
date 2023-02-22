@@ -34,15 +34,10 @@ void top_down_step(
 {
     #pragma omp parallel
     {
-        // vertex_set list;
-        // vertex_set_init(&list, g->num_nodes);
-        // vertex_set* new_frontier_private = &list;
-
         std::vector<int> nf_private;
 
         #pragma omp for
         for (int i=0; i<frontier->count; i++) {
-            // printf("Hello %d\n", i);
             int node = frontier->vertices[i];
 
             int start_edge = g->outgoing_starts[node];
@@ -57,34 +52,23 @@ void top_down_step(
                 if (distances[outgoing] == NOT_VISITED_MARKER) {
                     distances[outgoing] = distances[node] + 1;
                     
-                    // int index;
-                    
-                    // index = new_frontier_private->count++;
-
-                    // new_frontier_private->vertices[index] = outgoing;
                     nf_private.push_back(outgoing);
                 }
             }
-            // printf("End %d\n", i);
+
         }
 
         int start;
         #pragma omp critical
         {
             start = new_frontier->count;
-            // new_frontier->count += new_frontier_private->count;
             new_frontier->count += nf_private.size();
         }
-
-        // for(int i=0; i<new_frontier_private->count; i++) {
-        //     new_frontier->vertices[start++] = new_frontier_private->vertices[i];
-        // }
 
         for(int i=0; i<nf_private.size(); i++) {
             new_frontier->vertices[start++] = nf_private[i];
         }
 
-        // free(list.vertices);
     }
 }
 
@@ -151,10 +135,6 @@ void bottom_up_step(
 
     #pragma omp parallel
     {
-        // vertex_set list;
-        // vertex_set_init(&list, g->num_nodes);
-        // vertex_set* new_frontier_private = &list;
-
         std::vector<int> nf_private;
 
         #pragma omp for
@@ -170,7 +150,6 @@ void bottom_up_step(
                     if(fmap[u]) {
                         distances[v] = distances[u] + 1;
                                           
-                        // new_frontier_private->vertices[new_frontier_private->count++] = v;
                         nf_private.push_back(v);
                         break;
                     }
@@ -182,19 +161,12 @@ void bottom_up_step(
         #pragma omp critical
         {
             start = new_frontier->count;
-            // new_frontier->count += new_frontier_private->count;
             new_frontier->count += nf_private.size();
         }
-
-        // for(int i=0; i<new_frontier_private->count; i++) {
-        //     new_frontier->vertices[start++] = new_frontier_private->vertices[i];
-        // }
 
         for(int i=0; i<nf_private.size(); i++) {
             new_frontier->vertices[start++] = nf_private[i];
         }
-
-        // free(list.vertices);
     }
 }
 
@@ -293,7 +265,6 @@ void bfs_hybrid(Graph graph, solution* sol)
             {
                 #pragma omp section
                 {
-                    // #pragma omp parallel for lastprivate(mf)
                     for(int i=0; i<frontier->count; i++) {
                         
                         mf += outgoing_size(graph, frontier->vertices[i]);
@@ -302,7 +273,6 @@ void bfs_hybrid(Graph graph, solution* sol)
 
                 #pragma omp section
                 {   
-                    // #pragma omp parallel for lastprivate(mu)
                     for(int i=0; i<graph->num_nodes; i++) {
                         if(sol->distances[i] == NOT_VISITED_MARKER) {
                             mu += incoming_size(graph, i);
@@ -316,7 +286,6 @@ void bfs_hybrid(Graph graph, solution* sol)
             }
         }
         
-        // alpha = 14, beta = 24.
         if(stage == 1) {
             bottom_up_step(graph, frontier, new_frontier, sol->distances);
         }
