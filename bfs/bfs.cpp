@@ -263,7 +263,6 @@ void bfs_hybrid(Graph graph, solution* sol)
     int stage = 0;
 
     // initialize all nodes to NOT_VISITED
-    #pragma omp parallel for
     for (int i=0; i<graph->num_nodes; i++)
         sol->distances[i] = NOT_VISITED_MARKER;
 
@@ -289,13 +288,25 @@ void bfs_hybrid(Graph graph, solution* sol)
             int mf = 0;
             int mu = 0;
 
-            for(int i=0; i<frontier->count; i++) {
-                mf += outgoing_size(graph, frontier->vertices[i]);
-            }
+            #pragma omp sections
+            {
+                #pragma omp section
+                {
+                    #pragma omp parallel for lastprivate(mf)
+                    for(int i=0; i<frontier->count; i++) {
+                        
+                        mf += outgoing_size(graph, frontier->vertices[i]);
+                    }
+                }
 
-            for(int i=0; i<graph->num_nodes; i++) {
-                if(sol->distances[i] == NOT_VISITED_MARKER) {
-                    mu += incoming_size(graph, i);
+                #pragma omp section
+                {   
+                    #pragma omp parallel for lastprivate(mu)
+                    for(int i=0; i<graph->num_nodes; i++) {
+                        if(sol->distances[i] == NOT_VISITED_MARKER) {
+                            mu += incoming_size(graph, i);
+                        }
+                    }
                 }
             }
 
