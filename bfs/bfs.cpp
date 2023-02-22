@@ -144,7 +144,7 @@ void bottom_up_step(
 {
     bool fmap[g->num_nodes] = { false };
 
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic, 50)
     for(int i=0; i<frontier->count; i++) {
         fmap[frontier->vertices[i]] = true;
     }
