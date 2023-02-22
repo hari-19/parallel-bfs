@@ -306,7 +306,7 @@ void bfs_hybrid(Graph graph, solution* sol)
                         if(sol->distances[i] == NOT_VISITED_MARKER) {
                             mu += incoming_size(graph, i);
                         }
-                    // }
+                    }
                 // }
             // }
 
