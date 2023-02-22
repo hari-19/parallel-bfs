@@ -288,7 +288,7 @@ void bfs_hybrid(Graph graph, solution* sol)
             int mf = 0;
             int mu = 0;
 
-            #pragma omp sections
+            #pragma omp parallel sections
             {
                 #pragma omp section
                 {
